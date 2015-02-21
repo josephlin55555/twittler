@@ -1,27 +1,238 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <script src="jquery.js"></script>
-    <script src="data_generator.js"></script>
-  </head>
-  <body>
-    <script>
+<head>
 
-      $(document).ready(function(){
-        var $body = $('body');
-        $body.html('');
+  <link rel="stylesheet" href='extra.css'>
 
+  <script src="jquery.js"></script>
+  <script src="data_generator.js"></script>
+
+</head>
+<body>
+
+  <script>
+
+  $(document).ready(function(){
+    var tweet_array_primary = [];
+
+    function filter_func(array, func) {
+      var final = [];
+      for(var i = 0; i < array.length; i++) {
+        if(func(array[i])) {
+          final.push(array[i]);
+        }
+      }
+
+      return final;
+    }
+
+    $(this).on('click', '.tweet_user', function() { //handles clicking
+      var user_name = $(this).html().slice(1); //returns user or tweet_array_primary[0]
+      var filtered_arrays = filter_func(tweet_array_primary, function(array1) {
+        return array1[0] === user_name;
+      });
+
+      var tooltips = $('<div id="tooltips"></div>');
+      var index_1 = filtered_arrays.length - 1;
+
+      var title_1 = $('<div></div>');
+      title_1.text("Timeline of '" + user_name + "'");
+      title_1.appendTo(tooltips);
+
+      var spacing = $('<div><br></div>');
+      spacing.appendTo(tooltips);
+
+      while(index_1 >= 0) {
+
+        var user_1 = $('<div></div>');
+        user_1.text('@' + user_name);
+        user_1.appendTo(tooltips);
+
+        var text_1 = $('<div></div>');
+        text_1.text(filtered_arrays[index_1][1]);
+        text_1.appendTo(tooltips);
+
+        var time = $('<div></div>');
+        time.text(tweet_final_func(filtered_arrays[index_1][2], filtered_arrays[index_1][3], filtered_arrays[index_1][4], 
+          filtered_arrays[index_1][5], filtered_arrays[index_1][6], filtered_arrays[index_1][7], filtered_arrays[index_1][8]));
+        time.appendTo(tooltips);
+
+        var spacing_2 = $('<div><br></div>');
+        spacing_2.appendTo(tooltips);
+
+        index_1 -= 1;
+      }
+
+      tooltips.prependTo($body);
+    });
+
+    function tweet_final_func(day_of_week, month, day_numeric, year, hours, minutes, seconds) {
+      var final = '';
+
+      var add_zero_in_front = function(input) {
+        if(input >=0 && input <= 9) {
+          return "0" + input;
+        }
+        else {
+          return String(input);
+        }
+      }
+
+      switch(day_of_week) {
+        case 0:
+        final += "Sunday ";
+        break;
+
+        case 1:
+        final += "Monday ";
+        break;
+
+        case 2: 
+        final += "Tuesday ";
+        break;
+
+        case 3: 
+        final += "Wednesday ";
+        break;
+
+        case 4: 
+        final += "Thursday ";
+        break;
+
+        case 5:
+        final += "Friday ";
+        break;
+
+        case 6:
+        final += "Saturday ";
+        break;
+
+        default:
+        final += "Error in days_of_week ";
+      }
+
+      switch(month) {
+        case 1:
+        final += "January ";
+        break;
+
+        case 2:
+        final += "February ";
+        break;
+
+        case 3:
+        final += "March ";
+        break;
+
+        case 4:
+        final += "April ";
+        break;
+
+        case 5:
+        final += "May ";
+        break;
+
+        case 6:
+        final += "June ";
+        break;
+
+        case 7:
+        final += "July ";
+        break;
+
+        case 8:
+        final += "August ";
+        break;
+
+        case 9:
+        final += "September ";
+        break;
+
+        case 10:
+        final += "October ";
+        break;
+
+        case 11:
+        final += "November ";
+        break;
+
+        case 12:
+        final += "December ";
+        break;
+
+        default: 
+        final += "Error in month ";
+      }
+
+      final += day_numeric + " ";
+      final += year + " ";
+      final += add_zero_in_front(hours) + ':' + add_zero_in_front(minutes) + ':' + add_zero_in_front(seconds) + ' UTC-8 Pacific Time'; 
+
+      return final;
+    }
+
+    var $body = $('body');
+    $body.html('');
+
+        //headers
+        var header_tag = $('<header></header>');
+        
+        var header_h1 = $('<h5>AUTOMATICALLY UPDATED EVERY 8 SECONDS</h5><h1>Twittler</h1>');
+        header_h1.appendTo(header_tag);
+        var header_h2 = $('<h2>A Completely Original Site</h2>');
+        header_h2.appendTo(header_tag);
+
+        header_tag.appendTo($body);
+
+        //tweets
         var index = streams.home.length - 1;
         while(index >= 0){
           var tweet = streams.home[index];
-          var $tweet = $('<div></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message);
-          $tweet.appendTo($body);
+          var $tweet = $('<p></p>');
+
+          //$tweet.text('@' + tweet.user + ': ' + tweet.message);
+          //$tweet.appendTo($body);
+          var tweet_user = $('<div class="tweet_user"></div><br>');
+          tweet_user.text('@' + tweet.user);
+          tweet_user.appendTo($tweet);
+
+          var tweet_message = $('<div class="tweet_message"></div><br>');
+          tweet_message.text(tweet.message);
+          tweet_message.appendTo($tweet);
+
+          var tweet_time = $('<div class="tweet_time"></div>');
+          var date_new = new Date();
+          var tweet_day_of_week = date_new.getDay(); //0 is sunday, 1 is monday
+          var tweet_day_numeric = date_new.getDate(); //1 - 31
+          var tweet_month = date_new.getMonth() + 1; //1 - 12
+          var tweet_year = date_new.getFullYear();
+          var tweet_hours = date_new.getHours();
+          var tweet_minutes = date_new.getMinutes();
+          var tweet_seconds = date_new.getSeconds();
+
+          tweet_time.text(tweet_final_func(tweet_day_of_week, tweet_month, tweet_day_numeric, tweet_year, tweet_hours, tweet_minutes, tweet_seconds));
+          tweet_time.appendTo($tweet);
+
+          $tweet.appendTo($body); //can also use .prependTo() function
+          
           index -= 1;
+          var tweet_array_secondary = [tweet.user, tweet.message, tweet_day_of_week, tweet_month, tweet_day_numeric, tweet_year, tweet_hours, tweet_minutes, tweet_seconds];
+          tweet_array_primary.push(tweet_array_secondary);
         }
+
+        
+        setInterval(function() {
+          location.reload();
+        }, 8000);
+        
+
+        $(this).on('click', 'h5', function() {
+          location.reload();
+        });
 
       });
 
-    </script>
-  </body>
+</script>
+
+</body>
 </html>
